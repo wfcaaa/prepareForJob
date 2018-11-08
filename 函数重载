@@ -1,0 +1,22 @@
+1. 函数重载的定义：同一作用域里 函数名字相同 形参列表不同的一组函数。
+   函数返回类型不同 其余部分相同的一组函数 不是函数重载！
+
+2. 函数重载 与 const：
+   a. 当形参为顶层const时，其他部分相同，不是函数重载：
+   bool create(int i);
+   bool create(const int i);
+
+   b. 当形参为某种类型的指针或引用，可以通过区分其指向的对象是常量对象还是非常量对象来实现函数重载
+
+   bool create(int * i);
+   bool create(const int *i);
+   or:
+   bool create(int i);
+   bool create(const int& i);
+   
+3. 顶层const和底层const：
+
+   a.顶层const：
+
+
+
