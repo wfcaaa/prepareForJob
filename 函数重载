@@ -16,7 +16,16 @@
    
 3. 顶层const和底层const：
 
-   a.顶层const：
+   a.顶层const：以指针为例 指针本身是const 为顶层const。
+   b.底层const：以指针为例 指针指向的对象是const 为底层cosnt， 对常量对象的引用也是底层const
+
+4. 默认状态下const对象仅在本文件内有效：
+   比如在file1.c 里有对象 const int lenth = 10；（const对象必须初始化） 编译器在编译的过程中会把文件中所以用到 lenth的地方替换成 10，
+   要想在多个文件内共享const对象 可以在const对象声明和定义的文件里加上关键字 extern：
+   //file1.c 定义并初始化一个const对象 
+   extern const int a = 10；
+   // file1.h 声明
+   extern const int a；
 
 
 
