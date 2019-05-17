@@ -1,0 +1,9 @@
+lexical_cast:类型转换
+#include<boost/lexical_cast.hpp>
+example:int id = 100; string id_str=boost::lexical_cast<string>(id);
+
+#############################################################
+list_of: 容器赋值
+#include<boost/assign/list_of.hpp>
+using boost::assign;
+vector<string> v1 = list_of("hello")("world")
