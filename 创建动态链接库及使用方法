@@ -1,0 +1,11 @@
+比如说我们有一个test.c文件，要生成一个名为libtest.so 的动态链接库，则命令如下：
+gcc -fPIC -shared test.c -o libtest.so
+
+我们在另外一个文件 libtest.so 要使用libtest.so的函数，有两种方法：
+方法一：
+export LD_LIBRARY_PATH=absolute_path /xxx/xxx/   //最后一层目录后要加“/”
+gcc -L libpath -ltest
+方法二：
+void *handle = NULL
+handle = dlopen("/xxx/xxx/libxxx.so",RTLD_NOW);
+dlsym(handle,"add");
