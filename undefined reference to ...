@@ -1,0 +1,90 @@
+在实际编译代码的过程中，我们经常会遇到"undefined reference to"的问题，简单的可以轻易地解决，但有些却隐藏得很深，需要花费大量的时间去排查。
+工作中遇到了各色各样类似的问题，按照以下几种可能出现的状况去排查，可有利于理清头绪，从而迅速解决问题
+
+case 1:链接时缺失了相关目标文件
+
+    // test.h
+     
+    #ifndef __TEST_H__
+    #define __TEST_H__
+     
+    void test();
+     
+    #endif
+     
+    // test.c
+     
+    #include <string.h>
+    #include <stdio.h>
+     
+     
+     
+    void test()
+    {
+        printf("just test it\n");
+    }
+     
+    // main.c
+     
+    #include "test.h"
+     
+    int main(int argc, char **argv)
+    {
+        test();
+     
+        return 0;
+    }
+
+通过以下的命令，我们将会得到两个.o文件。
+
+    $ gcc -c test.c  
+    $ gcc –c main.c 
+
+随后，我们将main.o这个文件，编译成可执行文件。
+
+    $ gcc -o main main.o
+    Undefined symbols for architecture x86_64:
+      "_test", referenced from:
+          _main in main.o
+    ld: symbol(s) not found for architecture x86_64
+    clang: error: linker command failed with exit code 1 (use -v to see invocation)
+
+编译时报错了，这是最典型的undefined reference错误，因为在链接时发现找不到某个函数的实现文件。如果按下面这种方式链接就正确了。
+
+$ gcc -o main main.o test.o
+
+当然，也可以按照如下的命令编译，这样就可以一步到位。
+
+$ gcc -o main main.c test.c
+
+case 2:链接的库文件中又使用了另一个库文件
+将main.c编译为可执行程序，由于main.c中包含了对test()的调用，因此，应该在链接时将test.a作为我们的库文件，链接命令如下。
+
+    $ gcc -o main main.c test.a
+    Undefined symbols for architecture x86_64:
+      "_func", referenced from:
+          _test in test.a(test.o)
+    ld: symbol(s) not found for architecture x86_64
+    clang: error: linker command failed with exit code 1 (use -v to see invocation)
+
+就是说，链接的时候发现test.a调用了func()函数，找不到对应的实现，我们还需要将test.a所引用到的库文件也加进来才能成功链接，因此命令如下。
+
+$ gcc -o main main.c test.a func.a
+
+同样，如果我们的库或者程序中引用了第三方库（如pthread.a）则在链接的时候需要给出第三方库的路径和库文件，否则就会得到undefined reference的错误。
+
+case3: 多个库文件链接顺序问题
+这种问题非常隐蔽，不仔细研究，可能会感到非常地莫名其妙。以上面示例为测试代码，把链接库的顺序换一下，如下所示：
+
+    $ gcc -o main main.c func.a test.a
+    test.a(test.o): In function `test':  
+    test.c:(.text+0x13): undefined reference to `func'  
+    collect2: ld returned 1 exit status
+
+因此，在链接命令中给出所依赖的库时，需要注意库之间的依赖顺序，依赖其他库的库一定要放到被依赖库的前面，
+这样才能真正避免undefined reference的错误，完成编译链接
+
+case4：在c++代码中链接c语言的库
+解决方法，在相关头文件加上"extern C"
+
+case5:声明为类的成员函数，在cpp文件中实现时没有加上类名
