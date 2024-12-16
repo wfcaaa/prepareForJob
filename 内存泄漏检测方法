@@ -1,0 +1,5 @@
+1. Valgrind 
+    valgrind --leak-check=full ./your_program
+2. AddressSanitizer (ASan): 这是一个快速内存错误检测工具，集成在GCC和Clang编译器中。
+   gcc -fsanitize=address -g your_program.c -o your_program
+  ./your_program
